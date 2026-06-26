@@ -45,7 +45,7 @@ In the consuming project, vendor the skills under a `vendor/` prefix:
 
 ```bash
 git remote add skills git@github.com:<owner>/agent-skills.git
-git subtree add --prefix=vendor/agent-skills skills main --squash
+git subtree add --prefix=vendor/agent-skills skills master --squash
 ```
 
 This commits the skills' files straight into the consuming repo, so a fresh
@@ -76,7 +76,7 @@ Edits flow **upstream → consumers**, never back through the subtree. Make chan
 here, push, then in each consumer:
 
 ```bash
-git subtree pull --prefix=vendor/agent-skills skills main --squash
+git subtree pull --prefix=vendor/agent-skills skills master --squash
 ```
 
 Do not edit the vendored copy in a consumer and push it back through subtree; the
