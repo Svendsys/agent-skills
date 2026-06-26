@@ -1,0 +1,32 @@
+phase,bug_set,model,arm,run,shots,total_tokens,found,total,used_skill,notes
+baseline,A1-A10,haiku,told,he1,48,52789,0,10,1,full matrix; declared no defects
+baseline,A1-A10,haiku,told,he2,48,58002,0,10,1,full matrix; judgment is the bottleneck
+baseline,A1-A10,sonnet,told,se1,52,82104,2,10,1,A4 A5; traced to source; missed blatant A1
+baseline,A1-A10,sonnet,told,se2,120,87103,1,10,1,A4 only; effort diluted across 5 themes
+baseline,A1-A10,opus,told,oe1,120,102861,2,10,1,A1 A4; root-caused to file:line
+baseline,A1-A10,opus,told,oe2,163,109256,2,10,1,A1 A4; most shots; real parallax-overflow find
+baseline,A1-A10,haiku,discovered,hi1,120,64584,0,10,1,discovered+ran themes tier; still 0
+baseline,A1-A10,haiku,discovered,hi2,360,55360,0,10,1,exhaustive 360 shots; read ~70; declared flawless
+baseline,A1-A10,sonnet,discovered,si1,120,104807,2,10,1,A1 A4; salvaged after fan-out stall; expensive
+baseline,A1-A10,sonnet,discovered,si2,120,60852,2,10,1,A3 A4; 39 findings; first to catch A3
+baseline,A1-A10,opus,discovered,oi1,360,121720,4,10,1,A1 A4 A5 A10; best score; uniquely caught A5+A10
+baseline,A1-A10,opus,discovered,oi2,218,96009,3,10,1,A1 A3 A4; clean+focused; 5 findings
+baseline,A1-A10,haiku,noskill,hn1,88,54020,0,10,0,false 404s; non-canonical viewports
+baseline,A1-A10,haiku,noskill,hn2,36,48605,0,10,0,fewer pages than skill default
+baseline,A1-A10,haiku,noskill,hn3,32,51162,0,10,0,8 false positives; botched theme-force
+baseline,A1-A10,haiku,noskill,hn4,52,53026,0,10,0,captured home+pricing; caught nothing
+baseline,A1-A10,sonnet,noskill,sn1,172,108043,1,10,0,A1; reinvented scroll-capture; missed easy A4
+baseline,A1-A10,sonnet,noskill,sn2,498,131599,1,10,0,A4; most shots+cost; measured overflow; missed A1
+baseline,A1-A10,sonnet,noskill,sn3,232,106909,0,10,0,only 2 themes; missed even A4
+baseline,A1-A10,sonnet,noskill,sn4,126,88367,1,10,0,A8; only agent to catch contact dead-gap
+baseline,A1-A10,opus,noskill,on1,373,108644,3,10,0,A1 A4 A5; best no-skill; geometric verification
+baseline,A1-A10,opus,noskill,on2,139,98795,1.5,10,0,A4 +A8 partial; dismissed gap as intended
+baseline,A1-A10,opus,noskill,on3,205,126635,4.5,10,0,A1 A4 A5 A10 +A6 partial; best of experiment; reinvented in-page audit
+baseline,A1-A10,opus,noskill,on4,210,113037,3.5,10,0,A4 A5 A9 +A8 partial; only agent to catch A9 via measured contrast
+audit,A1-A10,haiku,told,ht1,,28504,10,10,1,all 10; bucketed rotations as likely-intentional
+audit,A1-A10,haiku,told,ht2,,28489,10,10,1,relayed all 23 distinct issues incl 10 planted
+audit,A1-A10,haiku,discovered,ht3,,75182,10,10,1,discovered skill+ran audit; all 10
+audit,G1-G5,haiku,told,hg1,,37992,5,5,1,after overflow-y + text-over-image checks added
+audit,HX1-HX5,haiku,told,hh1,,43000,5,5,1,after offscreen-left/tap-target/content-escape/collapsed-content added
+audit,HX1-HX5,haiku,told,hh2,,49800,5,5,1,second run on hard set
+audit,HX1-HX5+EX1-EX3,haiku,told,hf1,,39500,8,8,1,frontier set incl opacity:0 invisible-text

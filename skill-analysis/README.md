@@ -9,8 +9,9 @@ finishing the run, not an optional write-up. These are *our reports*: the durabl
 record of what each skill is worth, and the ruler a later re-run reproduces. A
 benchmark whose numbers live only in a chat transcript hasn't been saved.
 
-This repo intentionally does **not** vendor in studies from any consuming project
-(e.g. a website that uses these skills); studies generated here stand on their own.
+Studies live here regardless of which project a benchmarked skill ships in — this
+repo is the durable home for *our reports*, including studies of skills that a
+consuming project (e.g. a website that vendors these skills) keeps local to itself.
 
 ## Layout
 
