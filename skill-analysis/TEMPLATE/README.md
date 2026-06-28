@@ -20,7 +20,7 @@ ones." Name the lead metric and the headline number that backs the verdict.
 
 ## Results
 
-### Haiku (anchor, n = 10 per cell)
+### small tier (anchor, n = 10 per cell)
 
 | Arm | <lead metric> | needed_human_help | output tokens | turns |
 | --- | --- | --- | --- | --- |
@@ -31,13 +31,13 @@ ones." Name the lead metric and the headline number that backs the verdict.
 _Then split the same grid by scenario, so the easy floor and the hard ceiling are
 visible separately._
 
-### Across models (cross-check, n = 3 for Sonnet / Opus)
+### Across tiers (cross-check, n = 3 for mid / large)
 
-| Model | No skill | Discovered | Told |
+| Tier | No skill | Discovered | Told |
 | --- | --- | --- | --- |
-| Haiku | | | |
-| Sonnet | | | |
-| Opus | | | |
+| small | | | |
+| mid | | | |
+| large | | | |
 
 ## What the data says
 

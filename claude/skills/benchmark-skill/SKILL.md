@@ -13,9 +13,11 @@ description: >-
 
 # Benchmark a Skill
 
-> This skill is Claude-specific: its harness drives the `claude` CLI in headless
-> mode and pins Claude model tiers. It lives under `claude/` for that reason and
-> can be generalized to other agents later if needed.
+> This skill still lives under `claude/` for one reason: its harness drives the
+> `claude` CLI in headless mode (`claude -p`, `--bare`, `--max-turns`, …). The model
+> tiers it measures across are **agent-agnostic** — named `small` / `mid` / `large`
+> by capability and cost, not by vendor (section 5) — so porting the harness to
+> another agent's headless CLI is all that remains to move it into `skills/`.
 
 A benchmark answers one question about a skill: **does it pay off, and where?**
 The deliverable is a self-contained study saved under
@@ -124,19 +126,28 @@ the lifeline and whether the skill removed the need.
 
 ## 5. Models and volume
 
+Run across **three model tiers**, named by capability and cost rather than by vendor so
+the benchmark survives model churn. Pick a concrete model for each tier from whatever
+agent the harness drives, and pin its full ID there (section 6):
+
+- **small** — the cheap, fast, weakest tier (a mini / economy model).
+- **mid** — the mid-capability, mid-cost tier.
+- **large** — the strongest, most expensive tier (a flagship / frontier model).
+
 Unless the human specifies otherwise:
 
-- **Haiku is the anchor: n = 10 runs per cell** (cell = model × scenario × arm). Weak
-  models flail hardest, so they carry the clearest signal and the tightest sample.
-- **Sonnet and Opus are a cross-check: n = 3 per cell.** They show how the skill's
-  usefulness scales as models get stronger — often correctness saturates while
-  autonomy, output tokens, and turns still move.
+- **The small tier is the anchor: n = 10 runs per cell** (cell = model × scenario × arm).
+  Weak models flail hardest, so they carry the clearest signal and the tightest sample.
+- **mid and large are a cross-check: n = 3 per cell.** They show how the skill's
+  usefulness scales as models get stronger — often correctness saturates while autonomy,
+  output tokens, and turns still move.
 
-**In an improvement loop, run Haiku only** until the result is satisfactory — you are
-tuning the skill for the weakest model first. Treat a Haiku-only pass as what it is: a
-partial tuning cohort, not a full refresh — leave an existing study's Sonnet/Opus cells
-in place, and re-run the full model set once the loop has converged to see how the tuned
-skill scales upward. (If the human names specific models or volumes, follow that instead.)
+**In an improvement loop, run the small tier only** until the result is satisfactory —
+you are tuning the skill for the weakest model first. Treat a small-only pass as what it
+is: a partial tuning cohort, not a full refresh — leave an existing study's mid and large
+cells in place, and re-run the full set of tiers once the loop has converged to see how
+the tuned skill scales upward. (If the human names specific models or volumes, follow
+that instead.)
 
 ## 6. The harness — isolated, hermetic, reproducible runs
 
@@ -167,10 +178,11 @@ also **hermetic** and **bounded**:
   `--max-budget-usd`) is a fine runaway *backstop* but is not a metric. Without caps one
   looping prompt or hung skill blocks the matrix forever. A run that hits any cap is
   recorded as a stall/failure (`capped` in the data), never silently dropped.
-- **Pin the models.** Tier aliases (`haiku`/`sonnet`/`opus`) resolve to *the latest*
-  model of that tier and drift over time, so a later rerun would silently compare a new
-  model against old rows. Pass **full, pinned model IDs** in the committed harness, and
-  record the resolved model id from each run's own output.
+- **Pin the models.** A tier alias — the friendly `small`/`mid`/`large`-style name a CLI
+  exposes for "the current model of this tier" — resolves to *the latest* such model and
+  drifts over time, so a later rerun would silently compare a new model against old rows.
+  Pass **full, pinned model IDs** in the committed harness, and record the resolved model
+  id from each run's own output.
 - **Contain side effects.** If the skill mutates git/remote/filesystem state, give each
   agent its own throwaway origin / sandbox so nothing reaches anything real.
 - **Stub what isn't under test.** A slow external gate the skill merely *invokes* (a
@@ -195,8 +207,8 @@ Produce, under `skill-analysis/<skill-name>/`:
   1. **Bottom line first** — a bold one-paragraph verdict ("Yes, on every model and
      metric" / "Yes, on the case that matters").
   2. **Scenario table** — situation → correct end-state.
-  3. **Results tables** — the Haiku grid (per arm, then split by scenario), then an
-     *across models* table. Lead with the metric chosen in section 1.
+  3. **Results tables** — the small-tier grid (per arm, then split by scenario), then an
+     *across tiers* table. Lead with the metric chosen in section 1.
   4. **What the data says** — a few tight, evidenced bullets, each citing numbers.
   5. **Why the no-skill agents struggle** — the mechanism, not just the gap.
   6. **Evidence** — link `evidence.md`; for visual skills embed cropped PNGs
@@ -212,8 +224,9 @@ Produce, under `skill-analysis/<skill-name>/`:
   `issues_found,issues_seeded,false_positives` so the report can compute recall and
   false-positive rate (section 1) — collapsing that to one bit would destroy those metrics.
   `skill_rev` is the target skill's commit SHA (or loop iteration) the row was measured
-  against — what separates rerun cohorts; `model_id` is the resolved pinned model;
-  `capped` flags a run that hit a turn/time/budget limit. **No dollar column** —
+  against — what separates rerun cohorts; `model` is the tier (`small`/`mid`/`large`) and
+  `model_id` is the resolved pinned model it ran as; `capped` flags a run that hit a
+  turn/time/budget limit. **No dollar column** —
   efficiency is tokens and turns (section 1). Keep the leading and trailing columns
   consistent across studies so they stay comparable.
 - **`evidence.md`** — verbatim transcript excerpts (the agents' own commands and final
@@ -248,5 +261,5 @@ start fresh); just don't leave one file in two shapes.
 - **Numbers come from the runs.** Token counts and turns are read from each run's own
   output, and outcomes from a mechanical check of the end-state — never estimated, and
   never reported in dollars.
-- **Weak model first.** Tune on Haiku through the loop; spend Sonnet/Opus only once it
-  has converged.
+- **Weak model first.** Tune on the small tier through the loop; spend mid and large only
+  once it has converged.

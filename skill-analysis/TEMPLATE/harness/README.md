@@ -13,9 +13,9 @@ Commit here:
   side effects never reach anything real;
 - **exact prompt files** — the byte-identical task text shared by all arms, plus the
   one extra sentence the *told* arm adds;
-- **the pinned flag set** — full pinned model IDs (never the drifting `haiku` /
-  `sonnet` / `opus` tier aliases), the turn/time/budget caps, and the
-  clean/`--bare` isolation flags confirmed against the installed CLI.
+- **the pinned flag set** — full pinned model IDs (never the drifting tier aliases a CLI
+  exposes for "the current `small` / `mid` / `large` model"), the turn/time/budget caps,
+  and the clean/`--bare` isolation flags confirmed against the installed CLI.
 
 A re-run uses this harness **unchanged** — that is what makes successive loop
 iterations comparable. See the `benchmark-skill` SKILL.md, section 6, for the full
