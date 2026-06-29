@@ -18,8 +18,10 @@ The deliverable is a self-contained study saved under
 `skill-analysis/<skill-name>/` — a report grounded in per-agent data, not vibes.
 **Saving the study is part of running the benchmark, not an afterthought:** every
 run persists its report, data, evidence, and harness under
-`skill-analysis/<skill-name>/` in this repo, so the result is durable and the next
-run can build on it. The shape to match is
+`skill-analysis/<skill-name>/`, so the result is durable and the next run can build on
+it. **If the repo you're working in has no `skill-analysis/` directory yet, create it**
+— it is the home for these studies, so set it up before saving the first one. The shape
+to match is
 [`skill-analysis/TEMPLATE/`](../../skill-analysis/TEMPLATE/) — read it before
 designing anything, and reason by archetype (section 1): a permission/license
 skill, a capability/environment skill, a QA/review skill, and a routine/workflow
