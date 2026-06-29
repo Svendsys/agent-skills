@@ -69,8 +69,8 @@ so reason about its nature first:
 | --- | --- | --- | --- |
 | **QA / review / safety** | catch what a bare agent misses | correctness, recall (issues caught), false-positive rate | secondary — a subtle bug found early saves more than tokens |
 | **Routine / workflow** | do a frequent task right and cheap | correctness **and** efficiency (output tokens, turns/attempts) | co-equal — it runs often |
-| **Permission / license** (e.g. `deploy-to-dev`) | act unattended where a bare agent stops to ask | autonomy (ran without human help), correctness | secondary |
-| **Capability / environment** (e.g. `visual-shot`) | know the gotchas a DIY attempt rediscovers | correctness, then efficiency (output tokens, turns — weak models flail) | strong signal at the weak end |
+| **Permission / license** (e.g. a deploy skill) | act unattended where a bare agent stops to ask | autonomy (ran without human help), correctness | secondary |
+| **Capability / environment** (e.g. a screenshot skill) | know the gotchas a DIY attempt rediscovers | correctness, then efficiency (output tokens, turns — weak models flail) | strong signal at the weak end |
 
 **Efficiency means token cost and attempts, never dollars.** Report **output tokens**
 (the volume the skill produces) and **turns/attempts** (agentic iterations, plus any
