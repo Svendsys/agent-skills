@@ -1,7 +1,7 @@
 # skill-analysis
 
 Benchmark studies that measure whether a skill actually pays off, produced by the
-[`benchmark-skill`](../claude/skills/benchmark-skill/SKILL.md).
+[`benchmark-skill`](../skills/benchmark-skill/SKILL.md).
 
 **Running a benchmark means saving its results here.** Every benchmark run persists
 its study under `skill-analysis/<skill-name>/` in this repo — that is part of

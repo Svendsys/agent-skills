@@ -21,9 +21,11 @@ the layout and how consumers wire it up.
    conventions, or invariants. Describe the *operation* and name a portable mechanism
    (e.g. the `gh` CLI for GitHub work). If a skill can only work with one agent, it
    does not belong in `skills/`.
-3. **Agent-specific skills live under that agent's folder.** `claude/skills/` holds
-   skills that genuinely need Claude (e.g. `benchmark-skill`, which drives the
-   `claude` CLI). Keep such coupling out of `skills/`.
+3. **Agent-specific skills live under that agent's folder.** A skill that genuinely needs
+   one agent — and can't be described in terms of a portable mechanism — lives under that
+   agent's folder (e.g. `claude/skills/`), not `skills/`. None do today: `benchmark-skill`
+   moved into `skills/` once its harness was framed around *any* headless agent runner
+   rather than one CLI.
 4. **Every `SKILL.md` has YAML frontmatter with `name` and `description`.** The
    `description` front-loads trigger words and states when to use the skill and when
    **not** to — both Claude Code and Codex select skills by matching it, so vague

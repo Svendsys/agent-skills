@@ -13,18 +13,16 @@ description: >-
 
 # Benchmark a Skill
 
-> This skill is Claude-specific: its harness drives the `claude` CLI in headless
-> mode and pins Claude model tiers. It lives under `claude/` for that reason and
-> can be generalized to other agents later if needed.
-
 A benchmark answers one question about a skill: **does it pay off, and where?**
 The deliverable is a self-contained study saved under
 `skill-analysis/<skill-name>/` — a report grounded in per-agent data, not vibes.
 **Saving the study is part of running the benchmark, not an afterthought:** every
 run persists its report, data, evidence, and harness under
-`skill-analysis/<skill-name>/` in this repo, so the result is durable and the next
-run can build on it. The shape to match is
-[`skill-analysis/TEMPLATE/`](../../../skill-analysis/TEMPLATE/) — read it before
+`skill-analysis/<skill-name>/`, so the result is durable and the next run can build on
+it. **If the repo you're working in has no `skill-analysis/` directory yet, create it**
+— it is the home for these studies, so set it up before saving the first one. The shape
+to match is
+[`skill-analysis/TEMPLATE/`](../../skill-analysis/TEMPLATE/) — read it before
 designing anything, and reason by archetype (section 1): a permission/license
 skill, a capability/environment skill, a QA/review skill, and a routine/workflow
 skill each lead with a different metric, so pick the one closest to your target
@@ -105,7 +103,7 @@ the *told* arm adds one sentence naming the skill.
 
 | Arm | Setup | Question it answers |
 | --- | --- | --- |
-| **No skill** | Skill tool disabled — pure DIY | what a bare agent does |
+| **No skill** | skill mechanism disabled — pure DIY | what a bare agent does |
 | **Skill (discovered)** | skill present, prompt never names it | does the agent surface it from a plain request? |
 | **Skill (told)** | skill present, prompt names it | the skill's ceiling when invoked |
 
@@ -124,36 +122,54 @@ the lifeline and whether the skill removed the need.
 
 ## 5. Models and volume
 
+Run across **three model tiers**, named by capability and cost rather than by vendor so
+the benchmark survives model churn. Pick a concrete model for each tier from whatever
+agent the harness drives, and pin its full ID there (section 6):
+
+- **small** — the cheap, fast, weakest tier (a mini / economy model).
+- **mid** — the mid-capability, mid-cost tier.
+- **large** — the strongest, most expensive tier (a flagship / frontier model).
+
 Unless the human specifies otherwise:
 
-- **Haiku is the anchor: n = 10 runs per cell** (cell = model × scenario × arm). Weak
-  models flail hardest, so they carry the clearest signal and the tightest sample.
-- **Sonnet and Opus are a cross-check: n = 3 per cell.** They show how the skill's
-  usefulness scales as models get stronger — often correctness saturates while
-  autonomy, output tokens, and turns still move.
+- **The small tier is the anchor: n = 10 runs per cell** (cell = model × scenario × arm).
+  Weak models flail hardest, so they carry the clearest signal and the tightest sample.
+- **mid and large are a cross-check: n = 3 per cell.** They show how the skill's
+  usefulness scales as models get stronger — often correctness saturates while autonomy,
+  output tokens, and turns still move.
 
-**In an improvement loop, run Haiku only** until the result is satisfactory — you are
-tuning the skill for the weakest model first. Treat a Haiku-only pass as what it is: a
-partial tuning cohort, not a full refresh — leave an existing study's Sonnet/Opus cells
-in place, and re-run the full model set once the loop has converged to see how the tuned
-skill scales upward. (If the human names specific models or volumes, follow that instead.)
+**In an improvement loop, run the small tier only** until the result is satisfactory —
+you are tuning the skill for the weakest model first. Treat a small-only pass as what it
+is: a partial tuning cohort, not a full refresh — leave an existing study's mid and large
+cells in place, and re-run the full set of tiers once the loop has converged to see how
+the tuned skill scales upward. (If the human names specific models or volumes, follow
+that instead.)
 
 ## 6. The harness — isolated, hermetic, reproducible runs
 
-Each agent is an isolated headless run — `claude -p` in its own fresh working copy of
-the repo. The harness only earns the "one variable" claim (section 3) if every run is
-also **hermetic** and **bounded**:
+Each agent is an isolated headless run in its own fresh working copy of the repo,
+launched by **a headless agent runner**: a non-interactive CLI or SDK that drives the
+model unattended. The runner is the experiment's substrate, not an incidental detail —
+it is what actually delivers the controls below, and **none of them can be reproduced by
+a written-down parameter alone**. Pick one runner, drive every cell of the matrix with
+it, and **confirm its exact invocation against the installed tool** — flag and option
+spellings differ between agents and drift between versions, so the committed harness
+(section 0), not this prose, is the source of truth for them.
 
-- **Hermetic — nothing leaks in from the host.** A fresh checkout is not enough:
-  `claude -p` otherwise discovers ambient CLAUDE.md/AGENTS.md, hooks, *other* skills,
-  plugins, MCP servers, and memory from whatever machine runs the harness, so two
-  operators get different context from the same script. Run each agent clean — the CLI's
-  bare/clean mode (`--bare` on current builds) or an equivalent isolated `HOME` plus an
-  explicit `--settings` — then add back **only** what the arm under test needs. Confirm
-  the exact flags against the installed CLI when you build the harness; the committed
-  harness, not this prose, is the source of truth for spellings.
+The harness earns the "one variable" claim (section 3) only if every run is also
+**hermetic** and **bounded** — and that is a property of the runner, not the prompt.
+Concretely, the runner must give every run, identically:
+
+- **Hermetic — nothing leaks in from the host.** A fresh checkout is not enough: a runner
+  left on its defaults discovers ambient instruction files (e.g. `AGENTS.md`),
+  hooks, *other* skills, plugins, MCP servers, and memory from whatever machine runs the
+  harness, so two operators get different context from the same script. Launch each agent
+  from a **clean context** — the runner's no-config/isolated launch mode, or an equivalent
+  isolated `HOME` and explicit settings path — then add back **only** what the arm under
+  test needs. (This is also why an orchestrator that fans out *in-session* subagents
+  cannot be the substrate: those subagents inherit its context and are not hermetic.)
 - **Skill access is the only knob.** No-skill arm: the target skill is absent and the
-  Skill tool disabled. Skill arms: expose **only** the target skill, no others. The
+  skill mechanism disabled. Skill arms: expose **only** the target skill, no others. The
   task text is byte-identical across arms; the *told* arm's one extra sentence is the
   sole textual difference.
 - **Identical permission posture across all arms.** Every arm runs with the *same*
@@ -162,29 +178,30 @@ also **hermetic** and **bounded**:
   skill or local settings — sails through, and `needed_human_help` ends up measuring
   approval friction instead of the skill's domain behaviour. Permission parity is what
   keeps section 4 honest.
-- **Bounded — every run is capped, identically.** Give each run the same turn cap
-  (`--max-turns`) and external wall-clock `timeout`; a coarse spend cap (e.g.
-  `--max-budget-usd`) is a fine runaway *backstop* but is not a metric. Without caps one
-  looping prompt or hung skill blocks the matrix forever. A run that hits any cap is
+- **Bounded — every run is capped, identically.** Give each run the same turn cap and
+  external wall-clock timeout; a coarse spend cap is a fine runaway *backstop* but is not
+  a metric. The runner must *enforce* these — a documented limit doesn't stop a looping
+  prompt or hung skill from blocking the matrix forever. A run that hits any cap is
   recorded as a stall/failure (`capped` in the data), never silently dropped.
-- **Pin the models.** Tier aliases (`haiku`/`sonnet`/`opus`) resolve to *the latest*
-  model of that tier and drift over time, so a later rerun would silently compare a new
-  model against old rows. Pass **full, pinned model IDs** in the committed harness, and
-  record the resolved model id from each run's own output.
+- **Pin the models.** A tier alias — the friendly `small`/`mid`/`large`-style name a
+  runner exposes for "the current model of this tier" — resolves to *the latest* such
+  model and drifts over time, so a later rerun would silently compare a new model against
+  old rows. Pass **full, pinned model IDs** in the committed harness, and record the
+  resolved model id from each run's own output.
 - **Contain side effects.** If the skill mutates git/remote/filesystem state, give each
   agent its own throwaway origin / sandbox so nothing reaches anything real.
 - **Stub what isn't under test.** A slow external gate the skill merely *invokes* (a
   test suite, a deploy) is stubbed to pass instantly so the measurement isolates the
   behaviour being studied — and the report's caveats say so, since stubbing
   *undercounts* a skill whose value includes that step.
-- **Capture the full transcript, from the source.** Persist each run's complete
-  turn-by-turn `stream-json` (with `--verbose`) to a per-run log — plain `--output-format
-  json` yields only the final result and metadata, which cannot substantiate the verbatim
-  command and message excerpts `evidence.md` needs. Read `turns`, `input_tokens`,
-  `output_tokens`, and the resolved model from each run's own `usage` / `modelUsage`
-  fields — never estimate, and do not record dollars. Tag every run uniquely.
+- **Capture the full transcript, from the source.** The runner must emit a
+  **machine-readable, turn-by-turn transcript**; persist each run's complete stream to a
+  per-run log, since a final-result-only summary cannot substantiate the verbatim command
+  and message excerpts `evidence.md` needs. Read `turns`, `input_tokens`, `output_tokens`,
+  and the resolved model from each run's own structured usage fields — never estimate, and
+  do not record dollars. Tag every run uniquely.
 
-Commit the runner, fixtures, exact prompt files, and the pinned flag set under
+Commit the runner, fixtures, exact prompt files, and the pinned invocation under
 `skill-analysis/<skill>/harness/` (section 0).
 
 ## 7. Write it up
@@ -195,8 +212,8 @@ Produce, under `skill-analysis/<skill-name>/`:
   1. **Bottom line first** — a bold one-paragraph verdict ("Yes, on every model and
      metric" / "Yes, on the case that matters").
   2. **Scenario table** — situation → correct end-state.
-  3. **Results tables** — the Haiku grid (per arm, then split by scenario), then an
-     *across models* table. Lead with the metric chosen in section 1.
+  3. **Results tables** — the small-tier grid (per arm, then split by scenario), then an
+     *across tiers* table. Lead with the metric chosen in section 1.
   4. **What the data says** — a few tight, evidenced bullets, each citing numbers.
   5. **Why the no-skill agents struggle** — the mechanism, not just the gap.
   6. **Evidence** — link `evidence.md`; for visual skills embed cropped PNGs
@@ -212,8 +229,9 @@ Produce, under `skill-analysis/<skill-name>/`:
   `issues_found,issues_seeded,false_positives` so the report can compute recall and
   false-positive rate (section 1) — collapsing that to one bit would destroy those metrics.
   `skill_rev` is the target skill's commit SHA (or loop iteration) the row was measured
-  against — what separates rerun cohorts; `model_id` is the resolved pinned model;
-  `capped` flags a run that hit a turn/time/budget limit. **No dollar column** —
+  against — what separates rerun cohorts; `model` is the tier (`small`/`mid`/`large`) and
+  `model_id` is the resolved pinned model it ran as; `capped` flags a run that hit a
+  turn/time/budget limit. **No dollar column** —
   efficiency is tokens and turns (section 1). Keep the leading and trailing columns
   consistent across studies so they stay comparable.
 - **`evidence.md`** — verbatim transcript excerpts (the agents' own commands and final
@@ -230,7 +248,7 @@ start fresh); just don't leave one file in two shapes.
 
 - **One variable, hermetically.** Across arms only skill access changes — same task
   text, fixtures, pinned models, volume, *and the same non-interactive permission
-  posture*. A second changed variable, or ambient host context (CLAUDE.md, other skills,
+  posture*. A second changed variable, or host context (instruction files, other skills,
   MCP, memory) leaking in, voids the comparison.
 - **Reproducible and bounded.** The committed harness — pinned model IDs, capped
   turns/budget/time, fixed flags — reproduces the study; a re-run uses it unchanged.
@@ -248,5 +266,5 @@ start fresh); just don't leave one file in two shapes.
 - **Numbers come from the runs.** Token counts and turns are read from each run's own
   output, and outcomes from a mechanical check of the end-state — never estimated, and
   never reported in dollars.
-- **Weak model first.** Tune on Haiku through the loop; spend Sonnet/Opus only once it
-  has converged.
+- **Weak model first.** Tune on the small tier through the loop; spend mid and large only
+  once it has converged.
