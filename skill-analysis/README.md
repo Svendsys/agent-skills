@@ -4,14 +4,17 @@ Benchmark studies that measure whether a skill actually pays off, produced by th
 [`benchmark-skill`](../skills/benchmark-skill/SKILL.md).
 
 **Running a benchmark means saving its results here.** Every benchmark run persists
-its study under `skill-analysis/<skill-name>/` in this repo — that is part of
+its study under `skill-analysis/<skill-name>/`, beside the skill it measures — that is part of
 finishing the run, not an optional write-up. These are *our reports*: the durable
 record of what each skill is worth, and the ruler a later re-run reproduces. A
 benchmark whose numbers live only in a chat transcript hasn't been saved.
 
-Studies live here regardless of which project a benchmarked skill ships in — this
-repo is the durable home for *our reports*, including studies of skills that a
-consuming project (e.g. a website that vendors these skills) keeps local to itself.
+A study lives **with the skill it measures**: a re-run reproduces it against that
+skill (see [`benchmark-skill`](../skills/benchmark-skill/SKILL.md), section 0), so the
+two belong in the same repo. This directory therefore holds studies only for the
+skills that ship here under [`skills/`](../skills/). A skill that lives in another
+project keeps its study there, beside the skill — a report stranded from the skill it
+reruns against is an orphan, not an archive.
 
 ## Layout
 

@@ -5,9 +5,10 @@ plain `SKILL.md` folders that any skill-aware coding agent can discover and use.
 Both Claude Code and Codex match on a skill's `description`, so each one front-loads
 its trigger words and says when to use it and when not to.
 
-This repo is designed to be **vendored into a consuming project via `git subtree`**
-(not a submodule), so the skills survive a plain `git clone` into an ephemeral
-sandbox — no second fetch, no scoped-credential problems.
+This repo is designed to be **vendored into a consuming project as real, committed
+files** by a small sync tool (not a submodule), so the skills survive a plain
+`git clone` into an ephemeral sandbox — no second fetch, no scoped-credential
+problems. A single config file picks which skills you want.
 
 ## What's here
 
@@ -16,6 +17,9 @@ agent-skills/
 ├── README.md                      # this file
 ├── AGENTS.md                      # cross-tool always-on note (the contribution bar)
 ├── CLAUDE.md                      # includes AGENTS.md, so Claude Code reads the same note
+├── BOOTSTRAP.md                   # stepped guide to vendor these into your repo
+├── agent-skills.config            # default skill selection (all) — seeded into consumers
+├── bin/agent-skills-sync          # the sync tool consumers vendor and run
 ├── skills/                        # agent-agnostic skills — usable by any tool
 │   ├── address-pr-comments/SKILL.md
 │   ├── benchmark-skill/SKILL.md
@@ -40,48 +44,55 @@ project points each tool at the folders directly (below).
   `SKILL.md`. A Codex-specific `openai.yaml` is added **only** if a skill genuinely
   needs Codex metadata — none here do.
 
-## Consuming this repo (git subtree)
+## Consuming this repo
 
-In the consuming project, vendor the skills under a `vendor/` prefix:
+Vendor the skills into a downstream repo with the sync tool — see
+**[`BOOTSTRAP.md`](BOOTSTRAP.md)** for the full stepped guide. The short version,
+run from your repo's root:
 
 ```bash
-git remote add skills git@github.com:<owner>/agent-skills.git
-git subtree add --prefix=vendor/agent-skills skills master --squash
+# one-time: clone upstream and run its sync tool against your repo
+git clone --depth 1 https://github.com/Svendsys/agent-skills.git /tmp/agent-skills-src
+/tmp/agent-skills-src/bin/agent-skills-sync
+
+# thereafter, sync (and self-update the tool) with one command
+./vendor/agent-skills/bin/agent-skills-sync
 ```
 
-This commits the skills' files straight into the consuming repo, so a fresh
-`git clone` already has them — nothing else to fetch.
+The tool commits the skills' files straight into your repo under
+`vendor/agent-skills/`, so a fresh `git clone` already has them — nothing to fetch
+at runtime. It seeds an **`agent-skills.config`** (defaulting to *all* skills) that
+you edit to choose which skills you want; each run vendors those and deletes any it
+no longer lists.
 
 ### Wire discovery for each tool
 
-Expose each vendored skill to the tools that should see it with a **per-skill
-relative symlink**, so a project's own (non-vendored) skills can coexist alongside:
+Create the skills dir for each tool you use, and the sync tool fills it with
+**per-skill relative symlinks** (pruning them when you drop a skill), so a project's
+own non-vendored skills coexist alongside:
 
 ```bash
-# Claude Code looks in .claude/skills/
-ln -s ../../vendor/agent-skills/skills/pr-review        .claude/skills/pr-review
-
-# Codex looks in .agents/skills/
-ln -s ../../vendor/agent-skills/skills/pr-review        .agents/skills/pr-review
+mkdir -p .claude/skills      # Claude Code looks here
+mkdir -p .agents/skills      # Codex looks here
+./vendor/agent-skills/bin/agent-skills-sync
 ```
 
-Were a skill ever kept under an agent-specific folder (e.g. `claude/skills/`), it would
-link only into that agent's own directory (e.g. `.claude/skills/`).
+Only dirs that already exist are wired, so create just the ones you need.
 
-> If a sandbox can't be trusted to follow symlinked skill directories, vendor the
-> skills as committed real copies instead and keep them in sync with a small script.
-> The folders are plain Markdown either way.
+> If a sandbox can't follow symlinked skill directories, point the tool at
+> `vendor/agent-skills/skills/` directly — the folders are plain Markdown and are
+> already real committed files either way.
 
 ## Updating — one way only
 
-Edits flow **upstream → consumers**, never back through the subtree. Make changes
-here, push, then in each consumer:
+Edits flow **upstream → consumers**, never back. Make changes here, push, then in
+each consumer re-run the sync:
 
 ```bash
-git subtree pull --prefix=vendor/agent-skills skills master --squash
+./vendor/agent-skills/bin/agent-skills-sync
 ```
 
-Do not edit the vendored copy in a consumer and push it back through subtree; the
+Do not edit the vendored copy in a consumer — the next sync overwrites it, and the
 upstream repo is the single source of truth (see `AGENTS.md`).
 
 ## The `SKILL.md` standard
