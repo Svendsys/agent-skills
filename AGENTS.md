@@ -7,9 +7,10 @@ directly. It is the contribution bar for the skills kept here.
 ## What this is
 
 `agent-skills` is a curated set of **agent-agnostic Agent Skills** — plain `SKILL.md`
-folders meant to be vendored into other projects via `git subtree` and discovered by
-any skill-aware coding agent (Claude Code, Codex, and others). See `README.md` for
-the layout and how consumers wire it up.
+folders meant to be vendored into other projects by the sync tool
+(`bin/agent-skills-sync`) and discovered by any skill-aware coding agent (Claude
+Code, Codex, and others). See `README.md` and `BOOTSTRAP.md` for the layout and how
+consumers wire it up.
 
 ## Rules for the skills here
 
@@ -36,9 +37,9 @@ the layout and how consumers wire it up.
 ## Updates flow one way
 
 This repo is the single upstream source. Edits are made here and pulled into
-consumers with `git subtree pull`; they are **never** pushed back through a
-consumer's subtree. A change vendored into a project and edited there is a fork to
-reconcile, not an update.
+consumers by the sync tool (`bin/agent-skills-sync`); they are **never** pushed
+back. A change vendored into a project and edited there is a fork to reconcile, not
+an update.
 
 ## Standard of work
 
