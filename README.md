@@ -18,10 +18,9 @@ agent-skills/
 ├── CLAUDE.md                      # includes AGENTS.md, so Claude Code reads the same note
 ├── skills/                        # agent-agnostic skills — usable by any tool
 │   ├── address-pr-comments/SKILL.md
+│   ├── benchmark-skill/SKILL.md
 │   ├── deep-review/SKILL.md
 │   └── pr-review/SKILL.md
-├── claude/skills/                 # Claude-specific skills (drive the `claude` CLI)
-│   └── benchmark-skill/SKILL.md
 └── skill-analysis/                # benchmark studies (see its README)
     ├── README.md
     └── TEMPLATE/
@@ -33,8 +32,10 @@ project points each tool at the folders directly (below).
 
 - **`skills/`** — repo- and tool-agnostic. No references to a specific agent, no
   tool-only tool names, no project-specific paths or conventions.
-- **`claude/skills/`** — skills that genuinely need a specific agent. Today that's
-  just `benchmark-skill`, which drives the `claude` CLI in headless mode.
+- **`<agent>/skills/`** (e.g. `claude/skills/`) — reserved for a skill that genuinely
+  needs one specific agent and can't be made portable. None qualify today:
+  `benchmark-skill` lived here until its harness was framed around *any* headless agent
+  runner, and now sits in `skills/`.
 - A skill may carry supporting files in `scripts/` and `references/` beside its
   `SKILL.md`. A Codex-specific `openai.yaml` is added **only** if a skill genuinely
   needs Codex metadata — none here do.
@@ -64,7 +65,8 @@ ln -s ../../vendor/agent-skills/skills/pr-review        .claude/skills/pr-review
 ln -s ../../vendor/agent-skills/skills/pr-review        .agents/skills/pr-review
 ```
 
-Claude-specific skills (under `claude/skills/`) link only into `.claude/skills/`.
+Were a skill ever kept under an agent-specific folder (e.g. `claude/skills/`), it would
+link only into that agent's own directory (e.g. `.claude/skills/`).
 
 > If a sandbox can't be trusted to follow symlinked skill directories, vendor the
 > skills as committed real copies instead and keep them in sync with a small script.
