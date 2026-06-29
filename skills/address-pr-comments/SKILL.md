@@ -112,8 +112,8 @@ of the PR, not just the first pass. Unsubscribe only once **all** hold: nothing
 left to address, the PR is merged into its base branch (read the base from the PR),
 and ~6 hours have passed with no activity (reset on each new event). The user
 saying stop, or the PR being closed unmerged, also ends it. Notifications often
-won't deliver CI success or the merge itself, so re-check the PR's real state
-rather than assuming silence.
+won't deliver CI success or the merge itself, so schedule a self check-in to
+re-check the PR's real state rather than assuming silence.
 
 A comment that lands **after merge** is still addressed. If it needs a fix (a
 merged PR takes no new commits), open a **new PR** off the base branch with the
