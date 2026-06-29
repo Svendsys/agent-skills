@@ -161,7 +161,7 @@ The harness earns the "one variable" claim (section 3) only if every run is also
 Concretely, the runner must give every run, identically:
 
 - **Hermetic — nothing leaks in from the host.** A fresh checkout is not enough: a runner
-  left on its defaults discovers ambient instruction files (`AGENTS.md`/`CLAUDE.md`),
+  left on its defaults discovers ambient instruction files (e.g. `AGENTS.md`),
   hooks, *other* skills, plugins, MCP servers, and memory from whatever machine runs the
   harness, so two operators get different context from the same script. Launch each agent
   from a **clean context** — the runner's no-config/isolated launch mode, or an equivalent
