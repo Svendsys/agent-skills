@@ -47,13 +47,14 @@ project points each tool at the folders directly (below).
 ## Consuming this repo
 
 Vendor the skills into a downstream repo with the sync tool — see
-**[`BOOTSTRAP.md`](BOOTSTRAP.md)** for the full stepped guide. The short version,
-run from your repo's root:
+**[`BOOTSTRAP.md`](BOOTSTRAP.md)** for the full stepped guide. The short version:
 
 ```bash
 # one-time: clone upstream and run its sync tool against your repo
 git clone --depth 1 https://github.com/Svendsys/agent-skills.git /tmp/agent-skills-src
-/tmp/agent-skills-src/bin/agent-skills-sync
+cd /path/to/your-repo                          # the repo you're vendoring into
+/tmp/agent-skills-src/bin/agent-skills-sync    # add --dry-run to preview first
+rm -rf /tmp/agent-skills-src                   # clone no longer needed
 
 # thereafter, sync (and self-update the tool) with one command
 ./vendor/agent-skills/bin/agent-skills-sync
